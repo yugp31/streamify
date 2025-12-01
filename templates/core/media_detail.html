@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ media.title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ media.title }}</h1>
+    <div class="card-meta">
+        Uploaded by {{ media.uploader.username }} on {{ media.uploaded_at|date:"M d, Y" }}
+        {% if media.is_ai_generated %} <span class="tag ai">AI Generated</span> {% endif %}
+    </div>
+    
+    <div class="media-player-container">
+        <video controls>
+            <source src="{{ media.file.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <p>{{ media.description }}</p>
+
+    <div class="comments-section">
+        <h3>Comments</h3>
+        {% for comment in media.comments.all %}
+            <div class="comment">
+                <span class="comment-author">{{ comment.user.username }}</span>
+                {{ comment.text }}
+            </div>
+        {% empty %}
+            <p>No comments yet.</p>
+        {% endfor %}
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'home' %}">&larr; Back to Home</a>
+    </div>
+{% endblock %}
+

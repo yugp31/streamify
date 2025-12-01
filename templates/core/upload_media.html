@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Media{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2>Upload Media</h2>
+    
+    <!-- Cloudinary Upload Widget Script -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
+    <form method="post" enctype="multipart/form-data" id="upload-form">
+        {% csrf_token %}
+        
+        <!-- Render form fields manually to control the file input -->
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {% if field.name == 'file' %}
+                    <!-- Hidden input to store the Cloudinary Public ID -->
+                    <input type="hidden" name="file" id="id_file" required>
+                    
+                    <!-- Button to trigger Cloudinary Widget -->
+                    <button type="button" id="upload_widget" class="cloudinary-button">Select File</button>
+                    <span id="file_name_display">No file selected</span>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+                {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" id="submit-btn" disabled style="margin-top: 20px;">Save Media</button>
+    </form>
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'home' %}">Cancel</a>
+    </div>
+</div>
+
+<script type="text/javascript">  
+var myWidget = cloudinary.createUploadWidget({
+  cloudName: 'dvsvkpcfa', 
+  uploadPreset: 'streamify_unsigned',
+  sources: ['local', 'url', 'camera'],
+  multiple: false,
+  resourceType: "video",
+  clientAllowedFormats: ["mp4", "mov", "avi", "mkv"],
+  maxFileSize: 100000000 // 100MB
+}, (error, result) => { 
+    if (!error && result && result.event === "success") { 
+      console.log('Done! Here is the image info: ', result.info); 
+      
+      // Set the hidden input value to the public_id (or secure_url if preferred, but CloudinaryField usually takes public_id)
+      // Actually, CloudinaryField in Django often expects the raw value to be the public_id + format or just public_id.
+      // Let's try passing the public_id.
+      document.getElementById('id_file').value = result.info.public_id;
+      
+      document.getElementById('file_name_display').innerText = result.info.original_filename + '.' + result.info.format;
+      document.getElementById('submit-btn').disabled = false;
+    }
+  }
+)
+
+document.getElementById("upload_widget").addEventListener("click", function(){
+    myWidget.open();
+  }, false);
+</script>
+
+<style>
+    .form-group { margin-bottom: 15px; }
+    .cloudinary-button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+    #file_name_display { margin-left: 10px; font-style: italic; }
+</style>
+{% endblock %}
+

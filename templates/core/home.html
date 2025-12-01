@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Latest Media</h2>
+    <div class="media-grid">
+        {% for media in media_list %}
+            <div class="card">
+                <h3><a href="{% url 'media_detail' media.pk %}">{{ media.title }}</a></h3>
+                <div class="card-meta">
+                    <span>{{ media.get_media_type_display }}</span>
+                    {% if media.is_ai_generated %} 
+                        <span class="tag ai">AI Generated</span> 
+                    {% endif %}
+                </div>
+                <p>{{ media.description|truncatewords:20 }}</p>
+                <small>By {{ media.uploader.username }}</small>
+            </div>
+        {% empty %}
+            <p>No media found.</p>
+        {% endfor %}
+    </div>
+{% endblock %}
+

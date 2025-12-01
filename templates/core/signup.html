@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <h2>Sign Up</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="errorlist">
+                <p>Please correct the errors below:</p>
+            </div>
+        {% endif %}
+        {{ form.as_p }}
+        <button type="submit">Sign Up</button>
+    </form>
+    <p style="margin-top: 20px;">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    <p><a href="{% url 'home' %}">&larr; Back to Home</a></p>
+</div>
+{% endblock %}
+
